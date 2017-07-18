@@ -53,7 +53,7 @@ key_df = pd.read_csv("../input/key_1.csv")
 
 submission_df = pd.merge(key_df, result_df, on='Page')
 
-submission_df.to_csv(path_or_buf="../output/submission.csv",columns=["Id","Visits"],index=False)
+submission_df.to_csv(path_or_buf="../output/fbpropheTsubmission.csv",columns=["Id","Visits"],index=False)
 
 
 
