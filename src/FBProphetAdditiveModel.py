@@ -40,12 +40,15 @@ train_df = pd.read_csv("../input/train_1.csv").fillna(0)
 #We iterate over all series
 pageArray = []
 VisitsArray = []
+
+limit_Prophet = 1000
+
 for i in range(0,len(train_df.index)):
 
     entry = train_df.iloc[i]
     page = entry[0]
 
-    if i < 1000:
+    if i < limit_Prophet:
         print(i)
         visits = pd.DataFrame(entry[1:].values,columns=["y"])
 
@@ -64,12 +67,12 @@ for i in range(0,len(train_df.index)):
             VisitsArray += forecast['yhat'].values.tolist()
 
         except:
-            visits = entry[-60:].median()
+            visits = entry[-68:-8].median()
             pageArray += [str(page+x) for x in dateStrings]
             VisitsArray += ([visits] * nr_predictions)
 
     else:
-        visits = entry[-60:].median()
+        visits = entry[-68:-8].median()
         pageArray += [str(page + x) for x in dateStrings]
         VisitsArray += ([visits] * nr_predictions)
 
