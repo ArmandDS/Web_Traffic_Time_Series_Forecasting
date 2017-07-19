@@ -1,8 +1,13 @@
 import numpy as np
 import pandas as pd
 import datetime
-import copy
+import copy,sys
 from fbprophet import Prophet
+
+
+startS = int(sys.argv[1])
+endS= int(sys.argv[2])
+prophet = bool(sys.argv[3])
 
 
 #Define prediction period strings for Phase 1
@@ -41,14 +46,12 @@ train_df = pd.read_csv("../input/train_1.csv").fillna(0)
 pageArray = []
 VisitsArray = []
 
-limit_Prophet = 2000
+if prophet:
 
-for i in range(0,len(train_df.index)):
+    for i in range(startS, endS):
+        entry = train_df.iloc[i]
+        page = entry[0]
 
-    entry = train_df.iloc[i]
-    page = entry[0]
-
-    if i < limit_Prophet:
         print(i)
         visits = pd.DataFrame(entry[1:].values,columns=["y"])
 
@@ -71,7 +74,10 @@ for i in range(0,len(train_df.index)):
             pageArray += [str(page+x) for x in dateStrings]
             VisitsArray += ([visits] * nr_predictions)
 
-    else:
+else:
+    for i in range(startS, endS):
+        entry = train_df.iloc[i]
+        page = entry[0]
         visits = entry[-68:-8].median()
         pageArray += [str(page + x) for x in dateStrings]
         VisitsArray += ([visits] * nr_predictions)
@@ -79,8 +85,4 @@ for i in range(0,len(train_df.index)):
 
 result_df= pd.DataFrame(data={"Page":pageArray,"Visits":VisitsArray},columns=["Page","Visits"])
 
-key_df = pd.read_csv("../input/key_1.csv")
-
-submission_df = pd.merge(key_df, result_df, on='Page')
-
-submission_df.to_csv(path_or_buf="../output/fbProphet_first2000TS_with_8missing_submission.csv",columns=["Id","Visits"],index=False)
+result_df.to_csv(path_or_buf="../partial/"+str(startS)+"_"+str(endS)+".csv",columns=["Id","Visits"],index=False)
