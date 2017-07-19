@@ -7,7 +7,11 @@ from fbprophet import Prophet
 
 startS = int(sys.argv[1])
 endS= int(sys.argv[2])
-prophet = bool(sys.argv[3])
+prophet = int(sys.argv[3])
+if prophet==1:
+    prophet=True
+else:
+    prophet=False
 
 
 #Define prediction period strings for Phase 1
@@ -52,7 +56,6 @@ if prophet:
         entry = train_df.iloc[i]
         page = entry[0]
 
-        print(i)
         visits = pd.DataFrame(entry[1:].values,columns=["y"])
 
         X = visits.join(train_date_df)
@@ -61,6 +64,8 @@ if prophet:
             #Predict
             m = Prophet()
             m.fit(X)
+
+            print(i)
 
             #Forecast
             forecast = m.predict(test_date_df)
@@ -85,4 +90,4 @@ else:
 
 result_df= pd.DataFrame(data={"Page":pageArray,"Visits":VisitsArray},columns=["Page","Visits"])
 
-result_df.to_csv(path_or_buf="../partial/"+str(startS)+"_"+str(endS)+".csv",columns=["Id","Visits"],index=False)
+result_df.to_csv(path_or_buf="../partial/"+str(startS)+"_"+str(endS)+".csv",columns=["Page","Visits"],index=False)
