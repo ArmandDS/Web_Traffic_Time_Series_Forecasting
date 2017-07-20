@@ -8,10 +8,17 @@ from fbprophet import Prophet
 startS = int(sys.argv[1])
 endS= int(sys.argv[2])
 prophet = int(sys.argv[3])
+removeOutliers = int(sys.argv[4])
+
 if prophet==1:
     prophet=True
 else:
     prophet=False
+
+if removeOutliers==1:
+    removeOutliers=True
+else:
+    removeOutliers=False
 
 
 #Define prediction period strings for Phase 1
@@ -58,7 +65,20 @@ if prophet:
 
         visits = pd.DataFrame(entry[1:].values,columns=["y"])
 
-        X = visits.join(train_date_df)
+        orig = copy.deepcopy(visits)
+
+        if removeOutliers:
+            visits['median'] = pd.rolling_median(visits, 50, min_periods=1)
+            std_mult = 1.5
+            visits.loc[np.abs(visits['y'] - visits['y'].median()) >= (std_mult * visits['y'].std()), 'y'] =\
+                visits.loc[np.abs(visits['y'] - visits['y'].median()) >= (std_mult * visits['y'].std()), 'median']
+
+
+
+        visits['ds'] = train_date_df
+        X = visits
+
+
 
         try:
             #Predict
